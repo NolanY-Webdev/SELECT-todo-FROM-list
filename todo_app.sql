@@ -1,10 +1,11 @@
-
+\c architekt_db
+-- (TEST WITH) SELECT * FROM tasks;
 -- 1. Write a query to delete a user named `michael` if it exists
 DROP USER IF EXISTS michael;
 
 -- 1. Write a query to create a user named `michael` with an encrypted password `stonebreaker`
 CREATE USER michael
-WITH ENCRYPTED PASSWORD stonebreaker;
+WITH ENCRYPTED PASSWORD 'stonebreaker';
 
 -- 1. Write a query to drop a database named `todo_app` if it exists
 DROP DATABASE IF EXISTS todo_app;
@@ -17,33 +18,34 @@ CREATE DATABASE todo_app;
 
 -- 1. Write a query to create a table named `tasks` using the **Initial columns** detailed below
 CREATE TABLE tasks (
-  id integer,
+  id serial,
   title character varying (255),
   description text,
-  created_at timestamp (no tz),
-  updated_at timestamp (no tz),
+  created_at timestamp,
+  updated_at timestamp,
   completed boolean
 );
 
 -- 1. Define column `id` as the table's primary key
 ALTER TABLE tasks
-ADD PRIMARY KEY TO (id);
+ADD PRIMARY KEY (id);
 
 -- 1. Write queries to accomplish the following
 --   1. remove the column named `completed`
 ALTER TABLE tasks
-DROP COLUMN (completed);
+DROP COLUMN completed;
 
 --   1. add a column to `tasks` named `completed_at`:timestamp, that may be NULL, and has a default value of `NULL`.
 ALTER TABLE tasks
-ADD COLUMN (completed_at)
-SET DATA TYPE timestamp
-SET DEFAULT NULL;
+ADD COLUMN completed_at timestamp
+DEFAULT NULL;
 
 --   1. change the `updated_at` column to not allow NULL values, and have a default value of `now()`
 ALTER TABLE tasks
-ALTER COLUMN (updated_at)
-SET NOT NULL
+ALTER COLUMN updated_at
+SET NOT NULL;
+ALTER TABLE tasks
+ALTER COLUMN updated_at
 SET DEFAULT now();
 
 --   1. create a new task, by only setting values (not defining which columns)
@@ -53,18 +55,21 @@ SET DEFAULT now();
 --   `created_at = now()`
 --   `updated_at = now()`
 --   `completed_at = NULL`
-INSERT INTO tasks (title, description, created_at) VALUES (
-  "Study SQL",
-  "Complete this exercise",
-  now()
+INSERT INTO tasks (id, title, description, created_at, updated_at, completed_at) VALUES (
+  DEFAULT,
+  'Study SQL',
+  'Complete this exercise',
+  now(),
+  DEFAULT,
+  DEFAULT
 );
 
 --   1. create a new task
---   `title = "Study PostgreSQL"`
---   `description = "Read all the documentation"`
+--   `title = 'Study PostgreSQL'`
+--   `description = 'Read all the documentation'`
 INSERT INTO tasks (title, description, created_at) VALUES (
-  "Study PostgreSQL",
-  "Read all the documentation",
+  'Study PostgreSQL',
+  'Read all the documentation',
   now()
 );
 
@@ -75,25 +80,25 @@ WHERE completed_at IS NULL;
 
 --   1. update the task with a title of `'Study SQL'` to be completed as of now
 UPDATE tasks
-SET completed_at TO now()
-WHERE title IS "Study SQL";
+SET completed_at = now()
+WHERE title = 'Study SQL';
 
 --   1. select all titles and descriptions of tasks that are not yet completed
 SELECT title
 FROM tasks
-WHERE completed_at IS NULL;;
+WHERE completed_at IS NULL;
 
 --   1. select all fields of every task sorted by creation date in descending order
 SELECT *
 FROM tasks
-ORDER BY DESC USING created_at;
+ORDER BY created_at DESC;
 
 --   1. create a new task
 --   `title = 'mistake 1'`
 --   `description = 'a test entry'`
 INSERT INTO tasks (title, description, created_at) VALUES (
-  "mistake 1",
-  "a test entry",
+  'mistake 1',
+  'a test entry',
   now()
 );
 
@@ -101,8 +106,8 @@ INSERT INTO tasks (title, description, created_at) VALUES (
 --   `title = 'mistake 2'`
 --   `description = 'another test entry'`
 INSERT INTO tasks (title, description, created_at) VALUES (
-  "mistake 2",
-  "another test entry",
+  'mistake 2',
+  'another test entry',
   now()
 );
 
@@ -110,25 +115,33 @@ INSERT INTO tasks (title, description, created_at) VALUES (
 --   `title = 'third mistake'`
 --   `description = 'another test entry'`
 INSERT INTO tasks (title, description, created_at) VALUES (
-  "third mistake",
-  "another test entry",
+  'third mistake',
+  'another test entry',
   now()
 );
 
 --   1. select title fields of all tasks with a title that includes the word `'mistake'`
-;
+SELECT title
+FROM tasks
+WHERE title LIKE '%mistake%';
 
 --   1. delete the task that has a title of `mistake 1`
-;
+DELETE FROM tasks
+WHERE title LIKE 'mistake 1';
 
 --   1. select title and description fields of all tasks with a title that includes the word `'mistake'`
-;
+SELECT title, description
+FROM tasks
+WHERE title LIKE '%mistake%';
 
 --   1. delete all tasks that includes the word `'mistake'` in the title
-;
+DELETE FROM tasks
+WHERE title LIKE '%mistake%';
 
 --   1. select all fields of all tasks sorted by `title` in ascending order
-;
+SELECT *
+FROM tasks
+ORDER BY title ASC;
 
 
 
